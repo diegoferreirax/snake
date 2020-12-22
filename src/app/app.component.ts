@@ -160,13 +160,22 @@ export class AppComponent implements OnInit {
   regenerarFruta = (canvas) => {
     this.ctx = canvas.getContext("2d");
 
-    do {
-      var frutaX = this.retornaNumeroRandom(0, canvas.width);
-      var frutaY = this.retornaNumeroRandom(0, canvas.height);
-      var normalizedFrutaX = frutaX - (frutaX % 10);
-      var normalizedFrutaY = frutaY - (frutaY % 10);
-    } while (this.lsListaVelocidades.includes({ positionX: normalizedFrutaX, positionY: normalizedFrutaY }));
+    var frutaX = this.retornaNumeroRandom(0, canvas.width);
+    var frutaY = this.retornaNumeroRandom(0, canvas.height);
+    var normalizedFrutaX = frutaX - (frutaX % 10);
+    var normalizedFrutaY = frutaY - (frutaY % 10);
 
+    var verificaNovaFrutaAuxiliar = [];
+
+    do {
+      frutaX = this.retornaNumeroRandom(0, canvas.width);
+      frutaY = this.retornaNumeroRandom(0, canvas.height);
+      normalizedFrutaX = frutaX - (frutaX % 10);
+      normalizedFrutaY = frutaY - (frutaY % 10);
+
+      verificaNovaFrutaAuxiliar = this.lsListaVelocidades.filter(item => item.positionX === normalizedFrutaX && item.positionY === normalizedFrutaY);
+
+    } while (verificaNovaFrutaAuxiliar.length !== 0);
 
     this.oFruta = {
       positionX: normalizedFrutaX,
