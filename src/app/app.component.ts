@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -6,6 +6,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event) {
+    this.moverSnack(event);
+  }
 
   canvas;
   ctx;
@@ -25,7 +30,9 @@ export class AppComponent implements OnInit {
   lsListaVelocidades = [];
   oFruta = {};
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  ngAfterViewInit() {
 
     this.canvas = document.getElementById('canvas');
     this.w = this.canvas.width;
@@ -71,20 +78,7 @@ export class AppComponent implements OnInit {
 
     }, this.frameRate);
 
-
-    document.getElementById('body').addEventListener('keydown', (evento) => {
-      this.moverSnack(evento);
-    });
-
   }
-
-
-
-
-
-
-
-
 
   moverSnack = (evento) => {
 
