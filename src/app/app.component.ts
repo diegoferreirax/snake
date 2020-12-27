@@ -62,9 +62,10 @@ export class AppComponent implements OnInit {
       });
 
       this.pontos = this.lsListaVelocidades.length - 1;
+      this.pontos = this.pontos * 100;
       document.getElementById('contador').innerHTML = `Pontos ${this.pontos}`;
 
-      if ((this.pontos % 10) === 0 && this.pontosSalvos !== this.pontos) {
+      if ((this.pontos % 1000) === 0 && this.pontosSalvos !== this.pontos) {
         this.nivel += 1;
         this.pontosSalvos = this.pontos;
         this.frameRate -= 10;
