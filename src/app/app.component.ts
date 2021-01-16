@@ -1,4 +1,8 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Fruta } from './models/fruta.model';
+import { Game } from './models/game.model';
+import { Snake } from './models/snake.model';
+import { Velocidade } from './models/velocidade.model';
 
 @Component({
   selector: 'app-root',
@@ -14,29 +18,23 @@ export class AppComponent implements OnInit {
 
   canvas;
   ctx;
-  w;
-  h;
-  velocidadeX = 10;
-  velocidadeY = 0;
-  positionX = 0;
-  positionY = 0;
-  comeu = false;
-  nivel = 1;
-  pontos = 0;
-  pontosSalvos = 0;
-  frameRate = 50;
   lastDirection = 'ArrowRight';
 
-  lsListaVelocidades = [];
-  oFruta = {};
+  oFruta: Fruta = new Fruta();
+  oSnake: Snake = new Snake();
+  oGame: Game = new Game();
+
+  lsListaVelocidades: Velocidade[] = [];
 
   ngOnInit() { }
 
   ngAfterViewInit() {
 
     this.canvas = document.getElementById('canvas');
-    this.w = this.canvas.width;
-    this.h = this.canvas.height;
+    
+    this.oGame.setWidth(this.canvas.width);
+    this.oGame.setHeight(this.canvas.height);
+
     this.ctx = this.canvas.getContext("2d");
 
     this.resetarJogo(this.canvas);
@@ -44,40 +42,52 @@ export class AppComponent implements OnInit {
 
     window.setInterval(() => {
 
-      if (!this.comeu && this.lsListaVelocidades.length !== 0) {
+      if (!this.oSnake.getComeu() && this.lsListaVelocidades.length !== 0) {
         var tail = this.lsListaVelocidades.shift();
         this.ctx.clearRect(tail.positionX, tail.positionY, 10, 10);
       } else {
-        this.comeu = false;
+        this.oSnake.setComeu(false);
       }
 
-      this.positionX += this.velocidadeX;
-      this.positionY += this.velocidadeY;
+      var positionX = this.oSnake.getPositionX();
+      positionX += this.oSnake.getVelocidadeX();
+      this.oSnake.setPositionX(positionX);
 
-      this.ctx.fillRect(this.positionX, this.positionY, 10, 10);
+      var positionY = this.oSnake.getPositionY();
+      positionY += this.oSnake.getVelocidadeY();
+      this.oSnake.setPositionY(positionY);
+
+      this.ctx.fillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
 
       this.lsListaVelocidades.push({
-        positionX: this.positionX,
-        positionY: this.positionY
+        positionX: this.oSnake.getPositionX(),
+        positionY: this.oSnake.getPositionY()
       });
 
-      this.pontos = this.lsListaVelocidades.length - 1;
-      this.pontos = this.pontos * 100;
-      document.getElementById('contador').innerHTML = `Pontos ${this.pontos}`;
+      this.oGame.setPontos(this.lsListaVelocidades.length - 1);
+      this.oGame.setPontos(this.oGame.getPontos() * 100);
 
-      if ((this.pontos % 1000) === 0 && this.pontosSalvos !== this.pontos) {
-        this.nivel += 1;
-        this.pontosSalvos = this.pontos;
-        this.frameRate -= 10;
+      document.getElementById('contador').innerHTML = `Pontos ${this.oGame.getPontos()}`;
+
+      if ((this.oGame.getPontos() % 1000) === 0 && this.oGame.getPontosSalvos() !== this.oGame.getPontos()) {
+        
+        var nivel = this.oGame.getNivel();
+        this.oGame.setNivel(nivel += 1);
+
+        this.oGame.setPontosSalvos(this.oGame.getPontos());
+
+        var frameRate = this.oGame.getFrameRate();
+        this.oGame.setFrameRate(frameRate -= 10);
         this.ctx.fillStyle = this.retornaCorRandom();
-        document.getElementById('nivel').innerHTML = `Nível ${this.nivel}`;
+        document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
+
       } else {
-        document.getElementById('nivel').innerHTML = `Nível ${this.nivel}`;
+        document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
       }
 
       this.validarColisao();
 
-    }, this.frameRate);
+    }, this.oGame.getFrameRate());
 
   }
 
@@ -86,29 +96,29 @@ export class AppComponent implements OnInit {
     switch (evento['code']) {
       case 'ArrowLeft':
         if (this.lastDirection != 'ArrowRight') {
-          this.velocidadeX = -10;
-          this.velocidadeY = 0;
+          this.oSnake.setVelocidadeX(-10);
+          this.oSnake.setVelocidadeY(0);
           this.lastDirection = evento['code'];
         }
         break;
       case 'ArrowUp':
         if (this.lastDirection != 'ArrowDown') {
-          this.velocidadeX = 0;
-          this.velocidadeY = -10;
+          this.oSnake.setVelocidadeX(0);
+          this.oSnake.setVelocidadeY(-10);
           this.lastDirection = evento['code'];
         }
         break;
       case 'ArrowRight':
         if (this.lastDirection != 'ArrowLeft') {
-          this.velocidadeX = 10;
-          this.velocidadeY = 0;
+          this.oSnake.setVelocidadeX(10);
+          this.oSnake.setVelocidadeY(0);
           this.lastDirection = evento['code'];
         }
         break;
       case 'ArrowDown':
         if (this.lastDirection != 'ArrowUp') {
-          this.velocidadeX = 0;
-          this.velocidadeY = 10;
+          this.oSnake.setVelocidadeX(0);
+          this.oSnake.setVelocidadeY(10);
           this.lastDirection = evento['code'];
         }
         break;
@@ -120,20 +130,21 @@ export class AppComponent implements OnInit {
   validarColisao = () => {
 
     this.canvas = document.getElementById('canvas');
-    this.w = this.canvas.width;
-    this.h = this.canvas.height;
+    
+    this.oGame.setWidth(this.canvas.width);
+    this.oGame.setHeight(this.canvas.height);
 
-    if (this.w - 10 < this.positionX || this.positionX < 0 || this.h - 10 < this.positionY || this.positionY < 0) {
+    if (this.oGame.getWidth() - 10 < this.oSnake.getPositionX() || this.oSnake.getPositionY() < 0 || this.oGame.getHeight() - 10 < this.oSnake.getPositionY() || this.oSnake.getPositionX() < 0) {
       this.resetarJogo(this.canvas);
     }
 
-    if (this.positionX === this.oFruta['positionX'] && this.positionY === this.oFruta['positionY']) {
-      this.comeu = true;
+    if (this.oSnake.getPositionX() === this.oFruta.getPositionX() && this.oSnake.getPositionY() === this.oFruta.getPositionY()) {
+      this.oSnake.setComeu(true);
       this.regenerarFruta(this.canvas);
     }
 
     for (let i = 0; i < this.lsListaVelocidades.length - 1; i++) {
-      if (this.lsListaVelocidades[i].positionX == this.positionX && this.lsListaVelocidades[i].positionY == this.positionY) {
+      if (this.lsListaVelocidades[i].positionX == this.oSnake.getPositionX() && this.lsListaVelocidades[i].positionY == this.oSnake.getPositionY()) {
         this.resetarJogo(this.canvas);
       }
     }
@@ -145,15 +156,16 @@ export class AppComponent implements OnInit {
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     this.lsListaVelocidades = [];
-    this.comeu = false;
 
-    this.pontos = 0;
-    this.nivel = 0;
-    this.frameRate = 100;
-    this.positionX = 0;
-    this.positionY = 0;
-    this.velocidadeX = 10;
-    this.velocidadeY = 0;
+    this.oGame.setPontos(0);
+    this.oGame.setNivel(1);
+    this.oGame.setFrameRate(100);
+
+    this.oSnake.setComeu(false);
+    this.oSnake.setPositionX(0);
+    this.oSnake.setPositionY(0);
+    this.oSnake.setVelocidadeX(10);
+    this.oSnake.setVelocidadeY(0);
 
     this.regenerarFruta(canvas);
   }
@@ -178,12 +190,10 @@ export class AppComponent implements OnInit {
 
     } while (verificaNovaFrutaAuxiliar.length !== 0);
 
-    this.oFruta = {
-      positionX: normalizedFrutaX,
-      positionY: normalizedFrutaY
-    };
+    this.oFruta.setPositionX(normalizedFrutaX);
+    this.oFruta.setPositionY(normalizedFrutaY);
 
-    this.ctx.fillRect(this.oFruta['positionX'], this.oFruta['positionY'], 10, 10);
+    this.ctx.fillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
   }
 
   retornaNumeroRandom = (min, max) => {
