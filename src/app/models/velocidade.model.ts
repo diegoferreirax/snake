@@ -1,7 +1,7 @@
 export class Velocidade {
     
-    positionX: number;
-    positionY: number;
+    public positionX: number;
+    public positionY: number;
 
     constructor() { }
 

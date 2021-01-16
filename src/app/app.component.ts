@@ -31,7 +31,7 @@ export class AppComponent implements OnInit {
   ngAfterViewInit() {
 
     this.canvas = document.getElementById('canvas');
-    
+
     this.oGame.setWidth(this.canvas.width);
     this.oGame.setHeight(this.canvas.height);
 
@@ -69,8 +69,7 @@ export class AppComponent implements OnInit {
 
       document.getElementById('contador').innerHTML = `Pontos ${this.oGame.getPontos()}`;
 
-      if ((this.oGame.getPontos() % 1000) === 0 && this.oGame.getPontosSalvos() !== this.oGame.getPontos()) {
-        
+      if (this.oGame.calculateNextLevel()) {
         var nivel = this.oGame.getNivel();
         this.oGame.setNivel(nivel += 1);
 
@@ -130,7 +129,7 @@ export class AppComponent implements OnInit {
   validarColisao = () => {
 
     this.canvas = document.getElementById('canvas');
-    
+
     this.oGame.setWidth(this.canvas.width);
     this.oGame.setHeight(this.canvas.height);
 

@@ -60,5 +60,15 @@ export class Game {
         this.height = height;
     }
 
+    calculateNextLevel(): boolean {
+        if ((this.getPontos() % 1000) === 0 && this.getPontosSalvos() !== this.getPontos()) {
+            return true;
+
+        } else {
+            return false;
+
+        }
+    }
+
 
 }
