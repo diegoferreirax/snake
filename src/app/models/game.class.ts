@@ -7,6 +7,8 @@ export class Game {
     private width: number = 400;
     private height: number = 400;
 
+    constructor() { }
+
     getPontos(): number {
         return this.pontos;
     }

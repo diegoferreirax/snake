@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { Canvas } from './models/canvas.class';
 import { Fruta } from './models/fruta.class';
 import { Game } from './models/game.class';
 import { Snake } from './models/snake.class';
@@ -17,13 +18,12 @@ export class AppComponent implements OnInit {
     this.moverSnack(event);
   }
 
-  canvas: HTMLCanvasElement;
-  ctx: CanvasRenderingContext2D;
   lastDirection: string = 'ArrowRight';
 
   oFruta: Fruta = new Fruta();
   oSnake: Snake = new Snake();
   oGame: Game = new Game();
+  oCanvas: Canvas = new Canvas();
 
   lsListaVelocidades: Velocidade[] = [];
 
@@ -35,21 +35,21 @@ export class AppComponent implements OnInit {
 
   ngAfterViewInit(): void {
 
-    this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
+    this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
 
-    this.oGame.setWidth(this.canvas.width);
-    this.oGame.setHeight(this.canvas.height);
+    this.oGame.setWidth(this.oCanvas.getCanvas().width);
+    this.oGame.setHeight(this.oCanvas.getCanvas().height);
 
-    this.ctx = this.canvas.getContext("2d");
+    this.oCanvas.setCanvasRendering(this.oCanvas.getCanvas().getContext("2d"));
 
-    this.resetarJogo(this.canvas);
-    this.ctx.fillStyle = 'green';
+    this.resetarJogo(this.oCanvas);
+    this.oCanvas.getCanvasRendering().fillStyle = 'green';
 
     window.setInterval(() => {
 
       if (!this.oSnake.getComeu() && this.lsListaVelocidades.length !== 0) {
         var tail: Velocidade = this.lsListaVelocidades.shift();
-        this.ctx.clearRect(tail.positionX, tail.positionY, 10, 10);
+        this.oCanvas.getCanvasRendering().clearRect(tail.positionX, tail.positionY, 10, 10);
       } else {
         this.oSnake.setComeu(false);
       }
@@ -62,7 +62,7 @@ export class AppComponent implements OnInit {
       positionY += this.oSnake.getVelocidadeY();
       this.oSnake.setPositionY(positionY);
 
-      this.ctx.fillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
+      this.oCanvas.getCanvasRendering().fillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
 
       this.lsListaVelocidades.push({
         positionX: this.oSnake.getPositionX(),
@@ -82,7 +82,7 @@ export class AppComponent implements OnInit {
 
         var frameRate: number = this.oGame.getFrameRate();
         this.oGame.setFrameRate(frameRate -= 10);
-        this.ctx.fillStyle = this.gameUtilsService.retornaCorRandom();
+        this.oCanvas.getCanvasRendering().fillStyle = this.gameUtilsService.retornaCorRandom();
         document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
 
       } else {
@@ -133,10 +133,10 @@ export class AppComponent implements OnInit {
 
   validarColisao = (): void => {
 
-    this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
+    this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
 
-    this.oGame.setWidth(this.canvas.width);
-    this.oGame.setHeight(this.canvas.height);
+    this.oGame.setWidth(this.oCanvas.getCanvas().width);
+    this.oGame.setHeight(this.oCanvas.getCanvas().height);
 
     if (
       this.oGame.getWidth() - 10 < this.oSnake.getPositionX() ||
@@ -144,7 +144,7 @@ export class AppComponent implements OnInit {
       this.oGame.getHeight() - 10 < this.oSnake.getPositionY() ||
       this.oSnake.getPositionX() < 0
     ) {
-      this.resetarJogo(this.canvas);
+      this.resetarJogo(this.oCanvas);
     }
 
     if (
@@ -152,7 +152,7 @@ export class AppComponent implements OnInit {
       this.oSnake.getPositionY() === this.oFruta.getPositionY()
     ) {
       this.oSnake.setComeu(true);
-      this.regenerarFruta(this.canvas);
+      this.regenerarFruta(this.oCanvas);
     }
 
     for (let i = 0; i < this.lsListaVelocidades.length - 1; i++) {
@@ -160,14 +160,14 @@ export class AppComponent implements OnInit {
         this.lsListaVelocidades[i].positionX == this.oSnake.getPositionX() &&
         this.lsListaVelocidades[i].positionY == this.oSnake.getPositionY()
       ) {
-        this.resetarJogo(this.canvas);
+        this.resetarJogo(this.oCanvas);
       }
     }
   }
 
-  resetarJogo = (canvas): void => {
-    this.ctx = canvas.getContext("2d");
-    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+  resetarJogo = (canvas: Canvas): void => {
+    this.oCanvas.setCanvasRendering(canvas.getCanvas().getContext("2d"));
+    this.oCanvas.getCanvasRendering().clearRect(0, 0, canvas.getCanvas().width, canvas.getCanvas().height);
 
     this.lsListaVelocidades = [];
 
@@ -184,19 +184,19 @@ export class AppComponent implements OnInit {
     this.regenerarFruta(canvas);
   }
 
-  regenerarFruta = (canvas): void => {
-    this.ctx = canvas.getContext("2d");
+  regenerarFruta = (canvas: Canvas): void => {
+    this.oCanvas.setCanvasRendering(canvas.getCanvas().getContext("2d"));
 
-    var frutaX: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.width);
-    var frutaY: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.height);
+    var frutaX: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().width);
+    var frutaY: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().height);
     var normalizedFrutaX: number = frutaX - (frutaX % 10);
     var normalizedFrutaY: number = frutaY - (frutaY % 10);
 
     var verificaNovaFrutaAuxiliar: Velocidade[] = [];
 
     do {
-      frutaX = this.gameUtilsService.retornaNumeroRandom(0, canvas.width);
-      frutaY = this.gameUtilsService.retornaNumeroRandom(0, canvas.height);
+      frutaX = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().width);
+      frutaY = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().height);
       normalizedFrutaX = frutaX - (frutaX % 10);
       normalizedFrutaY = frutaY - (frutaY % 10);
 
@@ -207,7 +207,7 @@ export class AppComponent implements OnInit {
     this.oFruta.setPositionX(normalizedFrutaX);
     this.oFruta.setPositionY(normalizedFrutaY);
 
-    this.ctx.fillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
+    this.oCanvas.getCanvasRendering().fillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
   }
 
 }
