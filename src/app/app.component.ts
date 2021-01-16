@@ -1,8 +1,9 @@
 import { Component, HostListener, OnInit } from '@angular/core';
-import { Fruta } from './models/fruta.model';
-import { Game } from './models/game.model';
-import { Snake } from './models/snake.model';
+import { Fruta } from './models/fruta.class';
+import { Game } from './models/game.class';
+import { Snake } from './models/snake.class';
 import { Velocidade } from './models/velocidade.model';
+import { GameUtilsService } from './utils/game-utils.service';
 
 @Component({
   selector: 'app-root',
@@ -12,13 +13,13 @@ import { Velocidade } from './models/velocidade.model';
 export class AppComponent implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
-  onKeyDown(event) {
+  onKeyDown(event: KeyboardEvent) {
     this.moverSnack(event);
   }
 
-  canvas;
-  ctx;
-  lastDirection = 'ArrowRight';
+  canvas: HTMLCanvasElement;
+  ctx: CanvasRenderingContext2D;
+  lastDirection: string = 'ArrowRight';
 
   oFruta: Fruta = new Fruta();
   oSnake: Snake = new Snake();
@@ -26,11 +27,15 @@ export class AppComponent implements OnInit {
 
   lsListaVelocidades: Velocidade[] = [];
 
-  ngOnInit() { }
+  constructor(
+    private gameUtilsService: GameUtilsService
+  ) { }
 
-  ngAfterViewInit() {
+  ngOnInit(): void { }
 
-    this.canvas = document.getElementById('canvas');
+  ngAfterViewInit(): void {
+
+    this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
 
     this.oGame.setWidth(this.canvas.width);
     this.oGame.setHeight(this.canvas.height);
@@ -43,17 +48,17 @@ export class AppComponent implements OnInit {
     window.setInterval(() => {
 
       if (!this.oSnake.getComeu() && this.lsListaVelocidades.length !== 0) {
-        var tail = this.lsListaVelocidades.shift();
+        var tail: Velocidade = this.lsListaVelocidades.shift();
         this.ctx.clearRect(tail.positionX, tail.positionY, 10, 10);
       } else {
         this.oSnake.setComeu(false);
       }
 
-      var positionX = this.oSnake.getPositionX();
+      var positionX: number = this.oSnake.getPositionX();
       positionX += this.oSnake.getVelocidadeX();
       this.oSnake.setPositionX(positionX);
 
-      var positionY = this.oSnake.getPositionY();
+      var positionY: number = this.oSnake.getPositionY();
       positionY += this.oSnake.getVelocidadeY();
       this.oSnake.setPositionY(positionY);
 
@@ -70,14 +75,14 @@ export class AppComponent implements OnInit {
       document.getElementById('contador').innerHTML = `Pontos ${this.oGame.getPontos()}`;
 
       if (this.oGame.calculateNextLevel()) {
-        var nivel = this.oGame.getNivel();
+        var nivel: number = this.oGame.getNivel();
         this.oGame.setNivel(nivel += 1);
 
         this.oGame.setPontosSalvos(this.oGame.getPontos());
 
-        var frameRate = this.oGame.getFrameRate();
+        var frameRate: number = this.oGame.getFrameRate();
         this.oGame.setFrameRate(frameRate -= 10);
-        this.ctx.fillStyle = this.retornaCorRandom();
+        this.ctx.fillStyle = this.gameUtilsService.retornaCorRandom();
         document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
 
       } else {
@@ -90,35 +95,35 @@ export class AppComponent implements OnInit {
 
   }
 
-  moverSnack = (evento) => {
+  moverSnack = (evento: KeyboardEvent): void => {
 
-    switch (evento['code']) {
+    switch (evento.code) {
       case 'ArrowLeft':
         if (this.lastDirection != 'ArrowRight') {
           this.oSnake.setVelocidadeX(-10);
           this.oSnake.setVelocidadeY(0);
-          this.lastDirection = evento['code'];
+          this.lastDirection = evento.code;
         }
         break;
       case 'ArrowUp':
         if (this.lastDirection != 'ArrowDown') {
           this.oSnake.setVelocidadeX(0);
           this.oSnake.setVelocidadeY(-10);
-          this.lastDirection = evento['code'];
+          this.lastDirection = evento.code;
         }
         break;
       case 'ArrowRight':
         if (this.lastDirection != 'ArrowLeft') {
           this.oSnake.setVelocidadeX(10);
           this.oSnake.setVelocidadeY(0);
-          this.lastDirection = evento['code'];
+          this.lastDirection = evento.code;
         }
         break;
       case 'ArrowDown':
         if (this.lastDirection != 'ArrowUp') {
           this.oSnake.setVelocidadeX(0);
           this.oSnake.setVelocidadeY(10);
-          this.lastDirection = evento['code'];
+          this.lastDirection = evento.code;
         }
         break;
       default:
@@ -126,32 +131,42 @@ export class AppComponent implements OnInit {
     };
   }
 
-  validarColisao = () => {
+  validarColisao = (): void => {
 
-    this.canvas = document.getElementById('canvas');
+    this.canvas = <HTMLCanvasElement>document.getElementById('canvas');
 
     this.oGame.setWidth(this.canvas.width);
     this.oGame.setHeight(this.canvas.height);
 
-    if (this.oGame.getWidth() - 10 < this.oSnake.getPositionX() || this.oSnake.getPositionY() < 0 || this.oGame.getHeight() - 10 < this.oSnake.getPositionY() || this.oSnake.getPositionX() < 0) {
+    if (
+      this.oGame.getWidth() - 10 < this.oSnake.getPositionX() ||
+      this.oSnake.getPositionY() < 0 ||
+      this.oGame.getHeight() - 10 < this.oSnake.getPositionY() ||
+      this.oSnake.getPositionX() < 0
+    ) {
       this.resetarJogo(this.canvas);
     }
 
-    if (this.oSnake.getPositionX() === this.oFruta.getPositionX() && this.oSnake.getPositionY() === this.oFruta.getPositionY()) {
+    if (
+      this.oSnake.getPositionX() === this.oFruta.getPositionX() &&
+      this.oSnake.getPositionY() === this.oFruta.getPositionY()
+    ) {
       this.oSnake.setComeu(true);
       this.regenerarFruta(this.canvas);
     }
 
     for (let i = 0; i < this.lsListaVelocidades.length - 1; i++) {
-      if (this.lsListaVelocidades[i].positionX == this.oSnake.getPositionX() && this.lsListaVelocidades[i].positionY == this.oSnake.getPositionY()) {
+      if (
+        this.lsListaVelocidades[i].positionX == this.oSnake.getPositionX() &&
+        this.lsListaVelocidades[i].positionY == this.oSnake.getPositionY()
+      ) {
         this.resetarJogo(this.canvas);
       }
     }
   }
 
-  resetarJogo = (canvas) => {
+  resetarJogo = (canvas): void => {
     this.ctx = canvas.getContext("2d");
-
     this.ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     this.lsListaVelocidades = [];
@@ -169,19 +184,19 @@ export class AppComponent implements OnInit {
     this.regenerarFruta(canvas);
   }
 
-  regenerarFruta = (canvas) => {
+  regenerarFruta = (canvas): void => {
     this.ctx = canvas.getContext("2d");
 
-    var frutaX = this.retornaNumeroRandom(0, canvas.width);
-    var frutaY = this.retornaNumeroRandom(0, canvas.height);
-    var normalizedFrutaX = frutaX - (frutaX % 10);
-    var normalizedFrutaY = frutaY - (frutaY % 10);
+    var frutaX: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.width);
+    var frutaY: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.height);
+    var normalizedFrutaX: number = frutaX - (frutaX % 10);
+    var normalizedFrutaY: number = frutaY - (frutaY % 10);
 
-    var verificaNovaFrutaAuxiliar = [];
+    var verificaNovaFrutaAuxiliar: Velocidade[] = [];
 
     do {
-      frutaX = this.retornaNumeroRandom(0, canvas.width);
-      frutaY = this.retornaNumeroRandom(0, canvas.height);
+      frutaX = this.gameUtilsService.retornaNumeroRandom(0, canvas.width);
+      frutaY = this.gameUtilsService.retornaNumeroRandom(0, canvas.height);
       normalizedFrutaX = frutaX - (frutaX % 10);
       normalizedFrutaY = frutaY - (frutaY % 10);
 
@@ -193,19 +208,6 @@ export class AppComponent implements OnInit {
     this.oFruta.setPositionY(normalizedFrutaY);
 
     this.ctx.fillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
-  }
-
-  retornaNumeroRandom = (min, max) => {
-    return parseInt(Math.random() * (max - min) + min);
-  }
-
-  retornaCorRandom = () => {
-    var letters = '0123456789ABCDEF';
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-      color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
   }
 
 }
