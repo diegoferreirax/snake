@@ -35,7 +35,7 @@ export class AppComponent implements OnInit {
 
   ngAfterViewInit(): void {
 
-    this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
+    this.setCanvasHTMLElement();
     this.setCanvasRendering(this.oCanvas);
     this.oCanvas.setFillStyle('green');
 
@@ -48,7 +48,7 @@ export class AppComponent implements OnInit {
 
       if (!this.oSnake.getComeu() && this.lsListaVelocidades.length !== 0) {
         var tail: Velocidade = this.lsListaVelocidades.shift();
-        this.oCanvas.getCanvasRendering().clearRect(tail.positionX, tail.positionY, 10, 10);
+        this.setClearRect(tail.positionX, tail.positionY, 10, 10);
       } else {
         this.oSnake.setComeu(false);
       }
@@ -61,7 +61,7 @@ export class AppComponent implements OnInit {
       positionY += this.oSnake.getVelocidadeY();
       this.oSnake.setPositionY(positionY);
 
-      this.oCanvas.getCanvasRendering().fillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
+      this.setFillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
 
       this.lsListaVelocidades.push({
         positionX: this.oSnake.getPositionX(),
@@ -132,7 +132,7 @@ export class AppComponent implements OnInit {
 
   validarColisao = (): void => {
 
-    this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
+    this.setCanvasHTMLElement();
 
     this.oGame.setWidth(this.oCanvas.getCanvas().width);
     this.oGame.setHeight(this.oCanvas.getCanvas().height);
@@ -166,7 +166,7 @@ export class AppComponent implements OnInit {
 
   resetarJogo = (canvas: Canvas): void => {
     this.setCanvasRendering(canvas);
-    this.oCanvas.getCanvasRendering().clearRect(0, 0, canvas.getCanvas().width, canvas.getCanvas().height);
+    this.setClearRect(0, 0, canvas.getCanvas().width, canvas.getCanvas().height);
 
     this.lsListaVelocidades = [];
 
@@ -206,11 +206,23 @@ export class AppComponent implements OnInit {
     this.oFruta.setPositionX(normalizedFrutaX);
     this.oFruta.setPositionY(normalizedFrutaY);
 
-    this.oCanvas.getCanvasRendering().fillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
+    this.setFillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
   }
 
   setCanvasRendering(canvas: Canvas) {
     this.oCanvas.setCanvasRendering(canvas.getCanvas().getContext("2d"));
+  }
+
+  setClearRect(positionX: number, positionY: number, width: number, height: number) {
+    this.oCanvas.getCanvasRendering().clearRect(positionX, positionY, width, height);
+  }
+
+  setFillRect(positionX: number, positionY: number, width: number, height: number) {
+    this.oCanvas.getCanvasRendering().fillRect(positionX, positionY, width, height);
+  }
+
+  setCanvasHTMLElement() {
+    this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
   }
 
 }
