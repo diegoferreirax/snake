@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
       this.oGame.setPontos(this.lsListaVelocidades.length - 1);
       this.oGame.setPontos(this.oGame.getPontos() * 100);
 
-      document.getElementById('contador').innerHTML = `Pontos ${this.oGame.getPontos()}`;
+      this.exibirPontos();
 
       if (this.oGame.calculateNextLevel()) {
         var nivel: number = this.oGame.getNivel();
@@ -76,10 +76,10 @@ export class AppComponent implements OnInit {
         var frameRate: number = this.oGame.getFrameRate();
         this.oGame.setFrameRate(frameRate -= 10);
         this.oCanvas.setFillStyle(this.gameUtilsService.retornaCorRandom());
-        document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
 
+        this.exibirNivel();
       } else {
-        document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
+        this.exibirNivel();
       }
 
       this.validarColisao();
@@ -228,6 +228,14 @@ export class AppComponent implements OnInit {
 
   setCanvasHTMLElement() {
     this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
+  }
+  
+  exibirPontos() {
+    document.getElementById('contador').innerHTML = `Pontos ${this.oGame.getPontos()}`;
+  }
+
+  exibirNivel() {
+    document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
   }
 
 }
