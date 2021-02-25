@@ -4,6 +4,8 @@ import { Fruta } from './models/fruta.class';
 import { Game } from './models/game.class';
 import { Snake } from './models/snake.class';
 import { Velocidade } from './models/velocidade.model';
+import { MoveSnakeFactory } from './utils/factories/move-snake.factory';
+import { IMoveSnake } from './utils/interfaces/move-snake.interface';
 import { GameUtilsService } from './utils/services/game-utils.service';
 
 @Component({
@@ -90,32 +92,34 @@ export class AppComponent implements OnInit {
 
   moverSnack = (evento: KeyboardEvent): void => {
 
+    let moveSnake: IMoveSnake = new MoveSnakeFactory().create(evento.code);
+
     switch (evento.code) {
       case 'ArrowLeft':
         if (this.lastDirection != 'ArrowRight') {
-          this.oSnake.setVelocidadeX(-10);
-          this.oSnake.setVelocidadeY(0);
+          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
+          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
           this.lastDirection = evento.code;
         }
         break;
       case 'ArrowUp':
         if (this.lastDirection != 'ArrowDown') {
-          this.oSnake.setVelocidadeX(0);
-          this.oSnake.setVelocidadeY(-10);
+          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
+          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
           this.lastDirection = evento.code;
         }
         break;
       case 'ArrowRight':
         if (this.lastDirection != 'ArrowLeft') {
-          this.oSnake.setVelocidadeX(10);
-          this.oSnake.setVelocidadeY(0);
+          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
+          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
           this.lastDirection = evento.code;
         }
         break;
       case 'ArrowDown':
         if (this.lastDirection != 'ArrowUp') {
-          this.oSnake.setVelocidadeX(0);
-          this.oSnake.setVelocidadeY(10);
+          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
+          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
           this.lastDirection = evento.code;
         }
         break;
