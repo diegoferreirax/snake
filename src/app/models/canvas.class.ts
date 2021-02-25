@@ -22,4 +22,13 @@ export class Canvas {
         this.canvasRendering = canvasRendering;
     }
 
+
+    getFillStyle(): string {
+        return this.canvasRendering.fillStyle.toString();
+    }
+
+    setFillStyle(fillStyle: string): void {
+        this.canvasRendering.fillStyle = fillStyle;
+    }
+
 }

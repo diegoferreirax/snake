@@ -36,14 +36,13 @@ export class AppComponent implements OnInit {
   ngAfterViewInit(): void {
 
     this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
+    this.setCanvasRendering(this.oCanvas);
+    this.oCanvas.setFillStyle('green');
 
     this.oGame.setWidth(this.oCanvas.getCanvas().width);
     this.oGame.setHeight(this.oCanvas.getCanvas().height);
 
-    this.oCanvas.setCanvasRendering(this.oCanvas.getCanvas().getContext("2d"));
-
     this.resetarJogo(this.oCanvas);
-    this.oCanvas.getCanvasRendering().fillStyle = 'green';
 
     window.setInterval(() => {
 
@@ -82,7 +81,7 @@ export class AppComponent implements OnInit {
 
         var frameRate: number = this.oGame.getFrameRate();
         this.oGame.setFrameRate(frameRate -= 10);
-        this.oCanvas.getCanvasRendering().fillStyle = this.gameUtilsService.retornaCorRandom();
+        this.oCanvas.setFillStyle(this.gameUtilsService.retornaCorRandom());
         document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
 
       } else {
@@ -166,7 +165,7 @@ export class AppComponent implements OnInit {
   }
 
   resetarJogo = (canvas: Canvas): void => {
-    this.oCanvas.setCanvasRendering(canvas.getCanvas().getContext("2d"));
+    this.setCanvasRendering(canvas);
     this.oCanvas.getCanvasRendering().clearRect(0, 0, canvas.getCanvas().width, canvas.getCanvas().height);
 
     this.lsListaVelocidades = [];
@@ -185,7 +184,7 @@ export class AppComponent implements OnInit {
   }
 
   regenerarFruta = (canvas: Canvas): void => {
-    this.oCanvas.setCanvasRendering(canvas.getCanvas().getContext("2d"));
+    this.setCanvasRendering(canvas);
 
     var frutaX: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().width);
     var frutaY: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().height);
@@ -208,6 +207,10 @@ export class AppComponent implements OnInit {
     this.oFruta.setPositionY(normalizedFrutaY);
 
     this.oCanvas.getCanvasRendering().fillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
+  }
+
+  setCanvasRendering(canvas: Canvas) {
+    this.oCanvas.setCanvasRendering(canvas.getCanvas().getContext("2d"));
   }
 
 }
