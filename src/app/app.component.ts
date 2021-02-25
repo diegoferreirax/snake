@@ -55,32 +55,15 @@ export class AppComponent implements OnInit {
 
       this.setNewSnakePositions();
 
-      this.setFillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
-
       this.lsListaVelocidades.push({
         positionX: this.oSnake.getPositionX(),
         positionY: this.oSnake.getPositionY()
       });
 
-      this.oGame.setPontos(this.lsListaVelocidades.length - 1);
-      this.oGame.setPontos(this.oGame.getPontos() * 100);
-
+      this.oGame.setPontos((this.lsListaVelocidades.length - 1) * 100);
       this.exibirPontos();
 
-      if (this.oGame.calculateNextLevel()) {
-        var nivel: number = this.oGame.getNivel();
-        this.oGame.setNivel(nivel += 1);
-
-        this.oGame.setPontosSalvos(this.oGame.getPontos());
-
-        var frameRate: number = this.oGame.getFrameRate();
-        this.oGame.setFrameRate(frameRate -= 10);
-        this.oCanvas.setFillStyle(this.gameUtilsService.retornaCorRandom());
-
-        this.exibirNivel();
-      } else {
-        this.exibirNivel();
-      }
+      this.verifyNextLevel();
 
       this.validarColisao();
 
@@ -100,11 +83,7 @@ export class AppComponent implements OnInit {
 
   validarColisao = (): void => {
 
-    this.setCanvasHTMLElement();
-
-    this.oGame.setWidth(this.oCanvas.getCanvas().width);
-    this.oGame.setHeight(this.oCanvas.getCanvas().height);
-
+    // colisão parede
     if (
       this.oGame.getWidth() - 10 < this.oSnake.getPositionX() ||
       this.oSnake.getPositionY() < 0 ||
@@ -114,6 +93,7 @@ export class AppComponent implements OnInit {
       this.resetarJogo(this.oCanvas);
     }
 
+    // colisão fruta
     if (
       this.oSnake.getPositionX() === this.oFruta.getPositionX() &&
       this.oSnake.getPositionY() === this.oFruta.getPositionY()
@@ -122,6 +102,7 @@ export class AppComponent implements OnInit {
       this.regenerarFruta(this.oCanvas);
     }
 
+    // colisão corpo
     for (let i = 0; i < this.lsListaVelocidades.length - 1; i++) {
       if (
         this.lsListaVelocidades[i].positionX == this.oSnake.getPositionX() &&
@@ -133,8 +114,7 @@ export class AppComponent implements OnInit {
   }
 
   resetarJogo = (canvas: Canvas): void => {
-    this.setCanvasRendering(canvas);
-    this.setClearRect(0, 0, canvas.getCanvas().width, canvas.getCanvas().height);
+    this.oCanvas.getCanvasRendering().clearRect(0, 0, canvas.getCanvas().width, canvas.getCanvas().height);
 
     this.lsListaVelocidades = [];
 
@@ -147,12 +127,12 @@ export class AppComponent implements OnInit {
     this.oSnake.setPositionY(0);
     this.oSnake.setVelocidadeX(10);
     this.oSnake.setVelocidadeY(0);
+    this.oSnake.setLastDirection('ArrowRight');
 
     this.regenerarFruta(canvas);
   }
 
   regenerarFruta = (canvas: Canvas): void => {
-    this.setCanvasRendering(canvas);
 
     var frutaX: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().width);
     var frutaY: number = this.gameUtilsService.retornaNumeroRandom(0, canvas.getCanvas().height);
@@ -182,10 +162,12 @@ export class AppComponent implements OnInit {
     var positionY: number = this.oSnake.getPositionY();
 
     positionX += this.oSnake.getVelocidadeX();
-    this.oSnake.setPositionX(positionX);
-
     positionY += this.oSnake.getVelocidadeY();
+
+    this.oSnake.setPositionX(positionX);
     this.oSnake.setPositionY(positionY);
+
+    this.setFillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
   }
 
   setCanvasRendering(canvas: Canvas) {
@@ -210,6 +192,23 @@ export class AppComponent implements OnInit {
 
   exibirNivel() {
     document.getElementById('nivel').innerHTML = `Nível ${this.oGame.getNivel()}`;
+  }
+
+  verifyNextLevel() {
+    if (this.oGame.calculateNextLevel()) {
+      var nivel: number = this.oGame.getNivel();
+      this.oGame.setNivel(nivel += 1);
+
+      this.oGame.setPontosSalvos(this.oGame.getPontos());
+
+      var frameRate: number = this.oGame.getFrameRate();
+      this.oGame.setFrameRate(frameRate -= 10);
+      this.oCanvas.setFillStyle(this.gameUtilsService.retornaCorRandom());
+
+      this.exibirNivel();
+    } else {
+      this.exibirNivel();
+    }
   }
 
 }
