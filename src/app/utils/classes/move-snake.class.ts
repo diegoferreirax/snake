@@ -7,6 +7,9 @@ export class MoveLeftSnake implements IMoveSnake {
     returnVelocidadeY(): number {
         return 0;
     }
+    returnDirectionValidation(): string {
+        return 'ArrowRight';
+    }
 
 }
 
@@ -16,6 +19,9 @@ export class MoveUpSnake implements IMoveSnake {
     }
     returnVelocidadeY(): number {
         return -10;
+    }
+    returnDirectionValidation(): string {
+        return 'ArrowDown';
     }
 
 }
@@ -27,6 +33,9 @@ export class MoveRightSnake implements IMoveSnake {
     returnVelocidadeY(): number {
         return 0;
     }
+    returnDirectionValidation(): string {
+        return 'ArrowLeft';
+    }
 
 }
 
@@ -36,6 +45,9 @@ export class MoveDownSnake implements IMoveSnake {
     }
     returnVelocidadeY(): number {
         return 10;
+    }
+    returnDirectionValidation(): string {
+        return 'ArrowUp';
     }
 
 }

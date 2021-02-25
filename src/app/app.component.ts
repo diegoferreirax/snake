@@ -20,8 +20,6 @@ export class AppComponent implements OnInit {
     this.moverSnack(event);
   }
 
-  lastDirection: string = 'ArrowRight';
-
   oFruta: Fruta = new Fruta();
   oSnake: Snake = new Snake();
   oGame: Game = new Game();
@@ -96,36 +94,28 @@ export class AppComponent implements OnInit {
 
     switch (evento.code) {
       case 'ArrowLeft':
-        if (this.lastDirection != 'ArrowRight') {
-          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
-          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
-          this.lastDirection = evento.code;
-        }
+        this.setMoveSnake(evento, moveSnake);
         break;
       case 'ArrowUp':
-        if (this.lastDirection != 'ArrowDown') {
-          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
-          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
-          this.lastDirection = evento.code;
-        }
+        this.setMoveSnake(evento, moveSnake);
         break;
       case 'ArrowRight':
-        if (this.lastDirection != 'ArrowLeft') {
-          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
-          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
-          this.lastDirection = evento.code;
-        }
+        this.setMoveSnake(evento, moveSnake);
         break;
       case 'ArrowDown':
-        if (this.lastDirection != 'ArrowUp') {
-          this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
-          this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
-          this.lastDirection = evento.code;
-        }
+        this.setMoveSnake(evento, moveSnake);
         break;
       default:
         break;
     };
+  }
+
+  setMoveSnake(evento: KeyboardEvent, moveSnake: IMoveSnake): void {
+    if (this.oSnake.getLastDirection() != moveSnake.returnDirectionValidation()) {
+      this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
+      this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
+      this.oSnake.setLastDirection(evento.code);
+    }
   }
 
   validarColisao = (): void => {
@@ -233,7 +223,7 @@ export class AppComponent implements OnInit {
   setCanvasHTMLElement() {
     this.oCanvas.setCanvas(<HTMLCanvasElement>document.getElementById('canvas'));
   }
-  
+
   exibirPontos() {
     document.getElementById('contador').innerHTML = `Pontos ${this.oGame.getPontos()}`;
   }

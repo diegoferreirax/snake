@@ -5,6 +5,7 @@ export class Snake {
     private velocidadeX: number = 10;
     private velocidadeY: number = 0;
     private comeu: boolean = false;
+    private lastDirection: string = 'ArrowRight';
 
     constructor() { }
 
@@ -50,6 +51,15 @@ export class Snake {
 
     setComeu(comeu): void {
         this.comeu = comeu;
+    }
+
+
+    getLastDirection(): string {
+        return this.lastDirection;
+    }
+
+    setLastDirection(lastDirection): void {
+        this.lastDirection = lastDirection;
     }
 
 }

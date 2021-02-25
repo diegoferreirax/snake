@@ -7,21 +7,17 @@ import { IMoveSnake } from '../interfaces/move-snake.interface';
 export class MoveSnakeFactory {
 
     create(direction: string): IMoveSnake {
-        if (direction === 'ArrowLeft') {
-            return new MoveLeftSnake();
-        }
-        else if (direction === 'ArrowUp') {
-            return new MoveUpSnake();
-        }
-        else if (direction === 'ArrowRight') {
-            return new MoveRightSnake();
-        }
-        else if (direction === 'ArrowDown') {
-            return new MoveDownSnake();
-        }
-        else {
-            return new MoveRightSnake();
-        }
-
+        switch (direction) {
+            case 'ArrowLeft':
+                return new MoveLeftSnake();
+            case 'ArrowUp':
+                return new MoveUpSnake();
+            case 'ArrowRight':
+                return new MoveRightSnake();
+            case 'ArrowDown':
+                return new MoveDownSnake();
+            default:
+                break;
+        };
     }
 }
