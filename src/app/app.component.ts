@@ -4,7 +4,7 @@ import { Fruta } from './models/fruta.class';
 import { Game } from './models/game.class';
 import { Snake } from './models/snake.class';
 import { Velocidade } from './models/velocidade.model';
-import { GameUtilsService } from './utils/game-utils.service';
+import { GameUtilsService } from './utils/services/game-utils.service';
 
 @Component({
   selector: 'app-root',
@@ -53,13 +53,7 @@ export class AppComponent implements OnInit {
         this.oSnake.setComeu(false);
       }
 
-      var positionX: number = this.oSnake.getPositionX();
-      positionX += this.oSnake.getVelocidadeX();
-      this.oSnake.setPositionX(positionX);
-
-      var positionY: number = this.oSnake.getPositionY();
-      positionY += this.oSnake.getVelocidadeY();
-      this.oSnake.setPositionY(positionY);
+      this.setNewSnakePositions();
 
       this.setFillRect(this.oSnake.getPositionX(), this.oSnake.getPositionY(), 10, 10);
 
@@ -207,6 +201,17 @@ export class AppComponent implements OnInit {
     this.oFruta.setPositionY(normalizedFrutaY);
 
     this.setFillRect(this.oFruta.getPositionX(), this.oFruta.getPositionY(), 10, 10);
+  }
+
+  setNewSnakePositions() {
+    var positionX: number = this.oSnake.getPositionX();
+    var positionY: number = this.oSnake.getPositionY();
+
+    positionX += this.oSnake.getVelocidadeX();
+    this.oSnake.setPositionX(positionX);
+
+    positionY += this.oSnake.getVelocidadeY();
+    this.oSnake.setPositionY(positionY);
   }
 
   setCanvasRendering(canvas: Canvas) {
