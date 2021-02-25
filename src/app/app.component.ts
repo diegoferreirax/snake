@@ -89,28 +89,8 @@ export class AppComponent implements OnInit {
   }
 
   moverSnack = (evento: KeyboardEvent): void => {
-
     let moveSnake: IMoveSnake = new MoveSnakeFactory().create(evento.code);
 
-    switch (evento.code) {
-      case 'ArrowLeft':
-        this.setMoveSnake(evento, moveSnake);
-        break;
-      case 'ArrowUp':
-        this.setMoveSnake(evento, moveSnake);
-        break;
-      case 'ArrowRight':
-        this.setMoveSnake(evento, moveSnake);
-        break;
-      case 'ArrowDown':
-        this.setMoveSnake(evento, moveSnake);
-        break;
-      default:
-        break;
-    };
-  }
-
-  setMoveSnake(evento: KeyboardEvent, moveSnake: IMoveSnake): void {
     if (this.oSnake.getLastDirection() != moveSnake.returnDirectionValidation()) {
       this.oSnake.setVelocidadeX(moveSnake.returnVelocidadeX());
       this.oSnake.setVelocidadeY(moveSnake.returnVelocidadeY());
