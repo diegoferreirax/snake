@@ -17,8 +17,18 @@ export class AppComponent implements OnInit {
 
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent) {
-    this.moverSnack(event);
+
+    const currentTime = Date.now();
+    const milisecundsInterval = (currentTime - this.lastKeyTime);
+
+    if (milisecundsInterval > 56) {
+      this.moverSnack(event);
+    }
+
+    this.lastKeyTime = currentTime;
   }
+
+  lastKeyTime = Date.now();
 
   oFruta: Fruta = new Fruta();
   oSnake: Snake = new Snake();
