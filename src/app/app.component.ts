@@ -28,13 +28,12 @@ export class AppComponent implements OnInit {
     this.lastKeyTime = currentTime;
   }
 
-  lastKeyTime = Date.now();
-
   oFruta: Fruta = new Fruta();
   oSnake: Snake = new Snake();
   oGame: Game = new Game();
   oCanvas: Canvas = new Canvas();
 
+  lastKeyTime = Date.now();
   lsListaVelocidades: Velocidade[] = [];
 
   constructor(
